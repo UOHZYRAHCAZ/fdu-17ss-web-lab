@@ -1,0 +1,7 @@
+body{text-align: center;}
+select{width: 300px;}
+button{width:300px;}
+th{background-color: grey;color: whitesmoke;}
+table{margin: 0 auto;}
+td{padding: 0 0.5em;height: 1em;}
+td.oddtr{background-color:lightgrey }
