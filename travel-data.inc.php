@@ -8,7 +8,7 @@
   $excerpt1 = "At the end of the hot climb up to the top Lycabettus Hill you are greeted with the oasis that is the Ekklisia Agii Isidori church.";
   $reviewsNum1 = 15;
   $reviewsRating1 = 3;
-  
+
   $postId2 = 3;
   $userId2 = 5;
   $userName2 = "Frantisek  Wichterlova";
@@ -17,7 +17,7 @@
   $title2 = "Santorini Sunset";
   $excerpt2 = "Every evening as the sun sets in Fira, it seems that everyone who is not drinking or eating is rushing with their camera to the most picturesque locations in order to capture that famous Aegean sunset.";
   $reviewsNum2 = 38;
-  $reviewsRating2 = 5;  
+  $reviewsRating2 = 5;
 
   $postId3 = 9;
   $userId3 = 13;
@@ -25,9 +25,9 @@
   $date3 = "10/19/2017";
   $thumb3 = "8710289254.jpg";
   $title3 = "Looking towards Fira";
-  $excerpt3 = "The steamer Mongolia, belonging to the Peninsular and Oriental Company, built of iron, of two thousand eight hundred tons burden, and five hundred horse-power, was due at eleven o'clock a.m. on Wednesday, the 9th of October, at Suez.";  
+  $excerpt3 = "The steamer Mongolia, belonging to the Peninsular and Oriental Company, built of iron, of two thousand eight hundred tons burden, and five hundred horse-power, was due at eleven o'clock a.m. on Wednesday, the 9th of October, at Suez.";
   $reviewsNum3 = 3;
-  $reviewsRating3 = 2; 
+  $reviewsRating3 = 2;
 
 
   //-----------------------------------------上面为lab8的数据，下面为lab9的数据--------------------------------------------
@@ -35,10 +35,11 @@
   $continents = array("Asia","Africa","Europe","North America","South America", "Oceania");
 
   $countries = array();
+  $countries["CA"] = "Canada";
   $countries["DE"] = "Germany";
   $countries["GR"] = "Greece";
   $countries["IT"] = "Italy";
-  $countries["CA"] = "Canada";
+
   $countries["GB"] = "United Kingdom";
   $countries["US"] = "United States";
 
@@ -75,6 +76,6 @@
 
   $images[101] = array("id"=>101,"title" => "Seattle Scene", "description" => "View of the Space Needle and the EMP Museum", "country" => "United States", "city" => "Seattle", "user" => "Mark Taylor", "path" => "21587937686.jpg", "taken" => "September 23, 2017", "tags" => array("downtown","skyscrapper","architecture","modernism"));
 
-  $images[102] = array("id"=>102,"title" => "Millennium Park Chicago", "description" => "Jay Pritzker Pavilion at Millennium Park by Frank Gehry", "country" => "United States", "city" => "Chicago", "user" => "Mark Taylor", "path" => "22182041615.jpg", "taken" => "September 28, 2017", "tags" => array("downtown","skyscrapper","architecture","modernism")); 
-  
+  $images[102] = array("id"=>102,"title" => "Millennium Park Chicago", "description" => "Jay Pritzker Pavilion at Millennium Park by Frank Gehry", "country" => "United States", "city" => "Chicago", "user" => "Mark Taylor", "path" => "22182041615.jpg", "taken" => "September 28, 2017", "tags" => array("downtown","skyscrapper","architecture","modernism"));
+
 ?>
