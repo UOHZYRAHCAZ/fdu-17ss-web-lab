@@ -5,9 +5,13 @@
 ## 当前 Lab
 
 <<<<<<< HEAD:lab 06/fdu-17ss-web-lab-master/README.md
+<<<<<<< HEAD:lab 06/fdu-17ss-web-lab-master/README.md
 - [Lab06](./requirements/Lab06.md)
 =======
 - [Lab09](./requirements/Lab09.md)
+>>>>>>> upstream/master:README.md
+=======
+- [Lab10](./requirements/Lab10.md)
 >>>>>>> upstream/master:README.md
 
 ## 往期 Lab
@@ -21,6 +25,10 @@
 - [Lab06](./requirements/Lab06.md)
 - [Lab07](./requirements/Lab07.md)
 - [Lab08](./requirements/Lab08.md)
+<<<<<<< HEAD:lab 06/fdu-17ss-web-lab-master/README.md
+>>>>>>> upstream/master:README.md
+=======
+- [Lab09](./requirements/Lab09.md)
 >>>>>>> upstream/master:README.md
 
 ---
