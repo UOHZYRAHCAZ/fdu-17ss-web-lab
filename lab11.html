@@ -1,0 +1,388 @@
+<html>
+<head>
+<meta charset="utf-8">
+<title>LRC 歌词编辑器</title>
+<style>
+    nav ul {
+        position: fixed;
+        z-index: 99;
+        right: 5%;
+        border: 1px solid darkgray;
+        border-radius: 5px;
+        list-style:none;
+        padding: 0;
+    }
+
+    .tab {
+        padding: 1em;
+        display: block;
+    }
+
+    .tab:hover {
+        cursor: pointer;
+        background-color: lightgray !important;
+    }
+
+    td {
+        padding:0.2em;
+    }
+
+    textarea[name="edit_lyric"] {
+        width: 100%;
+        height: 50em;
+    }
+
+    input[type="button"] {
+        width: 100%;
+        height: 100%;
+    }
+
+    input[type="submit"] {
+        width: 100%;
+        height: 100%;
+    }
+
+    #td_submit {
+        text-align: center;
+    }
+
+    select {
+        display: block;
+    }
+
+    #lyric {
+        width: 35%;
+        height: 60%;
+        border: 0;
+        resize: none;
+        font-size: large;
+        line-height: 2em;
+        text-align: center;
+    }
+    #lyric{
+       overflow: hidden;
+       width: 800px;
+       height: 480px;
+       box-shadow: 0 0 5px black;
+       margin: 200px auto;
+   }
+   #lyric #words{
+       cursor: default;
+       transition: all 0.5s ease;
+       width: 100%;
+       height: 100%;
+       text-align: center;
+       font-size: 20px;
+   }
+   #words li{
+       height: 48px;
+       line-height: 48px;
+   }
+   #words .sel{
+       color: red;
+   }
+   ul,li{
+       margin: 0;
+       padding: 0;
+       list-style: none;
+   }
+</style>
+</head>
+<body>
+    <nav><ul>
+        <li id="d_edit" class="tab">Edit Lyric</li>
+        <li id="d_show" class="tab">Show Lyric</li>
+    </ul></nav>
+
+<!--歌词编辑部分-->
+<section id="s_edit" class="content">
+<form id="f_upload" action="upload_file.php" method="POST"enctype="multipart/form-data">
+    <p>请上传音乐文件</p>
+
+    <!--TODO: 在这里补充 html 元素，使 file_upload 上传后若为音乐文件，则可以直接播放-->
+    <audio controls="controls" id="audio_edit">
+    </audio>
+    <input type="file" name="file_upload" id="file_upload"onchange="getObjectURL(this)">
+    <table>
+        <tr><td>Title: <input id="titleinput"name="titleinput"type="text"></td><td>Artist: <input id="artistinput"name="artistinput"type="text"></td></tr>
+        <tr><td colspan="2"><textarea name="edit_lyric" id="edit_lyric"></textarea></td></tr>
+        <tr><td><input id="InsertTimeLabel"type="button" value="插入时间标签"></td>
+          <td><input id="SubmitTimeLabel"type="button" value="替换时间标签"></td></tr>
+        <tr><td colspan="2" id="td_submit"><input type="submit" value="Submit" onclick="return submitbtnclick()" ></td></tr>
+    </table>
+</form>
+</section>
+
+<!--歌词展示部分-->
+<section id="s_show" class="content">
+  <audio controls="controls" id="audio_show">
+  </audio>
+    <select id="selectmusic">
+    <!--TODO: 在这里补充 html 元素，使点开 #d_show 之后这里实时加载服务器中已有的歌名-->
+
+    </select>
+
+    <div id="lyric" >
+      <ul id="words" style="margin-top: 240px"></ul>
+    </dic>
+
+    <!--TODO: 在这里补充 html 元素，使选择了歌曲之后这里展示歌曲进度条，并且支持上下首切换-->
+
+</section>
+</body>
+<script src="https://cdn.bootcss.com/jquery/1.10.2/jquery.min.js">
+</script>
+<script>
+
+// 界面部分
+document.getElementById("d_edit").onclick = function () {click_tab("edit");};
+document.getElementById("d_show").onclick = function () {click_tab("show");};
+
+document.getElementById("d_show").click();
+
+function click_tab(tag) {
+    for (let i = 0; i < document.getElementsByClassName("tab").length; i++) document.getElementsByClassName("tab")[i].style.backgroundColor = "transparent";
+    for (let i = 0; i < document.getElementsByClassName("content").length; i++) document.getElementsByClassName("content")[i].style.display = "none";
+
+    document.getElementById("s_" + tag).style.display = "block";
+    document.getElementById("d_" + tag).style.backgroundColor = "darkgray";
+}
+
+// Edit 部分
+var edit_lyric_pos = 0;
+document.getElementById("edit_lyric").onmouseleave = function () {
+    edit_lyric_pos = document.getElementById("edit_lyric").selectionStart;
+};
+
+// 获取所在行的初始位置。
+function get_target_pos(n_pos) {
+    if (n_pos === undefined) n_pos = edit_lyric_pos;
+    let value = document.getElementById("edit_lyric").value;
+    let pos = 0;
+    for (let i = n_pos; i >= 0; i--) {
+        if (value.charAt(i) === '\n') {
+            pos = i + 1;
+            break;
+        }
+    }
+    return pos;
+}
+
+// 选中所在行。
+function get_target_line(n_pos) {
+    let value = document.getElementById("edit_lyric").value;
+    let f_pos = get_target_pos(n_pos);
+    let l_pos = 0;
+
+    for (let i = f_pos;i<=document.getElementById("edit_lyric").value.length; i++) {
+        if (value.charAt(i) === '\n') {
+            l_pos = i + 1;
+            break;
+        }
+        l_pos = i+1;
+    }
+    return [f_pos, l_pos];
+}
+//预览音频文件
+document.getElementById("file_upload").onchange=function(e){
+   let audio=document.getElementById("audio_edit");
+    let file=e.target.files[0];
+    if(file!=null){
+    if(/^audio/i.test(file.type)){
+      let src=window.URL.createObjectURL(file);
+        audio.src=src;
+    }else{
+        audio.pause();
+        alert("请选择音乐文件！");
+    }
+  }
+};
+/* HINT:
+ * 已经帮你写好了寻找每行开头的位置，可以使用 get_target_pos()
+ * 来获取第一个位置，从而插入相应的歌词时间。
+ * 在 textarea 中，可以通过这个 DOM 节点的 selectionStart 和
+ * selectionEnd 获取相对应的位置。
+ *
+ * TODO: 请实现你的歌词时间标签插入效果。
+ */
+  document.getElementById("InsertTimeLabel").onclick=function(){
+    if(document.getElementById("audio_edit").src!=""){
+      let audioEdit=document.getElementById("audio_edit");
+      let content=document.getElementById("edit_lyric").value;
+      if((get_target_pos()!=content.length)&&content.substring(get_target_pos(),get_target_pos()+1)!="["){
+      let hour = ("00"+Math.floor (audioEdit.currentTime / 3600)).slice(-2);
+      let other = audioEdit.currentTime % 3600;
+      let minute = ("00"+Math.floor (other / 60)).slice(-2);
+      let second = ("0"+(other % 60).toFixed(2)).slice(-5);
+      let time="["+hour+":"+minute+":"+second+"]";
+      document.getElementById("edit_lyric").value=content.substring(0,get_target_pos())+time+content.substring(get_target_pos(),content.length);
+    }}else{
+      alert("请先导入音乐");
+    }
+  };
+  document.getElementById("SubmitTimeLabel").onclick=function(){
+    if(document.getElementById("audio_edit").src!=""){
+      let audioEdit=document.getElementById("audio_edit");
+      let content=document.getElementById("edit_lyric").value;
+      if((get_target_pos()!=content.length)&&content.substring(get_target_pos(),get_target_pos()+1)=="["){
+      let hour = ("00"+Math.floor (audioEdit.currentTime / 3600)).slice(-2);
+      let other = audioEdit.currentTime % 3600;
+      let minute = ("00"+Math.floor (other / 60)).slice(-2);
+      let second = ("0"+(other % 60).toFixed(2)).slice(-5);
+      let time="["+hour+":"+minute+":"+second+"]";
+      document.getElementById("edit_lyric").value=content.substring(0,get_target_pos())+time+content.substring(get_target_pos()+13,content.length);
+    }}else{
+      alert("请先导入音乐");
+    }
+  };
+/* TODO: 请实现你的上传功能，需包含一个音乐文件和你写好的歌词文本。
+ */
+function submitbtnclick(){
+  if(document.getElementById("audio_edit").src!=""&&document.getElementById("titleinput").value!=""&&document.getElementById("artistinput").value!=""&&document.getElementById("edit_lyric").value!=""){
+    let lyriccontent=document.getElementById("edit_lyric").value;
+    if(lyriccontent.substring(0,1)=="["){
+      if(lyriccontent.substring(0,13)=="[00:00:00.00]"){
+        return true;
+      }else{
+        document.getElementById("edit_lyric").value="[00:00:00.00]\r\n"+lyriccontent;
+        return true;}
+    }else{alert("请输入正确的字幕");return false;}
+    return false;
+  }
+  else{
+    alert("请将所有信息完善");
+    return false;}
+}
+
+
+/* HINT:
+ * 实现歌词和时间的匹配的时候推荐使用 Map class，ES6 自带。
+ * 在 Map 中，key 的值必须是字符串，但是可以通过字符串直接比较。
+ * 每一行行高可粗略估计为 40，根据电脑差异或许会有不同。
+ * 当前歌词请以粗体显示。
+ * 从第八行开始，当歌曲转至下一行的时候，需要调整滚动条，使得当前歌
+ * 词保持在正中。
+ *
+ * TODO: 请实现你的歌词滚动效果。
+ */
+ $.ajax({type:"GET",
+         url:'my_dir.php',
+         data:{},
+         success:function(data){let mydir=eval(data);
+           if (mydir.length>=3) {
+             let select=document.getElementById("selectmusic");
+             let newoption=document.createElement("option");
+             let newoptionnode=document.createTextNode("请选择音乐");
+             newoption.appendChild(newoptionnode);
+             newoption.value="";
+              select.appendChild(newoption);
+             for (let i = 2; i <= mydir.length-1; i++) {
+               if(mydir[i].substring(mydir[i].length-4,mydir[i].length)==".mp3"){
+
+                 let newoption=document.createElement("option");
+                 let newoptionnode=document.createTextNode(mydir[i].slice(0,mydir[i].length-4));
+                 newoption.appendChild(newoptionnode);
+                 newoption.value=mydir[i].slice(0,mydir[i].length-4);
+                 select.appendChild(newoption);
+
+               }
+
+
+             }
+
+           }
+         },
+         dataType:"json"
+ });
+ var myselect=document.getElementById("selectmusic");
+ myselect.onchange=function(){
+   $('ul#words li').remove();
+   let index=myselect.selectedIndex;
+   if (myselect.options[index].value!=""){
+     let value=myselect.options[index].value;
+     document.getElementById("audio_show").src="./upload/"+value+".mp3";
+     $.ajax({type:"GET",
+             url:'showlyric.php',
+             data:{value},
+             success:function(data){
+               let lyricData=data.split('\n');
+               var formatTime = function(time){
+        var h =time.split(":")[0]
+        var m = time.split(':')[1];
+        var s = time.split(':')[2];
+        return Number(h)*3600+Number(m)*60+Number(s);
+    };
+
+    var lyricArray = [];
+    for(var i = 0;i<lyricData.length;i++){
+        var tmpTime = /\d+:\d+:\d+.\d+/.exec(lyricData[i]);
+        var tmpLyric = lyricData[i].split(/[\\[]\d+:\d+:\d+\d+.\d+]/);
+        if(tmpTime!=null){
+            lyricArray.push({time:formatTime(String(tmpTime)),lyric:tmpLyric[1]});
+        }
+    }
+
+    for(var i=0 ; i<lyricArray.length;i++){
+        var lyricBorder = document.getElementById('words');
+        var lyricEl = document.createElement('li');
+        lyricEl.innerHTML = lyricArray[i].lyric;
+        lyricBorder.appendChild(lyricEl);
+    }
+
+    var audio = document.getElementById('audio_show');
+    var count = 0;
+
+    var vaildTime = function(time,index){
+        console.log(index,lyricArray.length);
+        if(index<lyricArray.length-1){
+            if(time>=lyricArray[index].time&&time<=lyricArray[index+1].time){
+                return true;
+            }else{
+                return false;
+            }
+        }else{
+            if(time<=audio.duration){
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+    };
+
+    var wordEl = document.getElementById('words');
+    var marTop = parseInt(wordEl.style.marginTop);
+    audio.ontimeupdate = function(){
+        var time = audio.currentTime;
+        if(!vaildTime(time,count)) {
+            count++;
+        }
+        wordEl.style.marginTop = (marTop-count*48)+'px';
+        var li = wordEl.querySelectorAll('ul#words li');
+        for(var i = 0 ; i < li.length ; i++){
+            li[i].removeAttribute('class');
+        }
+        wordEl.querySelectorAll('ul#words li')[count].setAttribute('class','sel');
+        if(audio.ended){
+            wordEl.style.marginTop = marTop + 'px';
+            count=0;
+        }
+    }
+    audio.onseeked = function(){
+        var cur_time = audio.currentTime;
+        for(var _i = 0;_i <= lyricArray.length - 1;_i++){
+            if(_i!=lyricArray.length-1){
+            if (cur_time>=lyricArray[_i].time&&cur_time<=lyricArray[_i + 1].time)
+                count = _i;}else{if(cur_time>=lyricArray[_i].time)count = _i;}
+        }
+    };
+
+
+             },
+             dataType:"json"});
+   }else{ document.getElementById("audio_show").src="";
+ $('ul#words li').remove();}
+
+ }
+</script>
+</html>
