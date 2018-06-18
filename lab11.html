@@ -144,7 +144,11 @@ document.getElementById("d_show").click();
 function click_tab(tag) {
     for (let i = 0; i < document.getElementsByClassName("tab").length; i++) document.getElementsByClassName("tab")[i].style.backgroundColor = "transparent";
     for (let i = 0; i < document.getElementsByClassName("content").length; i++) document.getElementsByClassName("content")[i].style.display = "none";
+    if(tag=="edit"){document.getElementById("audio_show").pause();}
+    else {
+      document.getElementById("audio_edit").pause();
 
+    }
     document.getElementById("s_" + tag).style.display = "block";
     document.getElementById("d_" + tag).style.backgroundColor = "darkgray";
 }
